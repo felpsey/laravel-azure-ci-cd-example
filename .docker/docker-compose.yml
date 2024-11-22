@@ -5,6 +5,7 @@ services:
       dockerfile: .docker/app.Dockerfile
       platforms:
         - linux/amd64
+    image: laravel-azure-ci-cd-example:latest
     container_name: laravel-app
     networks:
       - laravel-network
