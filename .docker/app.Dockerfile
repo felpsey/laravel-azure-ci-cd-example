@@ -52,8 +52,5 @@ USER www-data
 # Install Laravel dependencies
 RUN composer install --optimize-autoloader --no-dev
 
-# Expose port 80
-EXPOSE 9000
-
 # Start NGINX and PHP-FPM
 CMD ["php-fpm"]
