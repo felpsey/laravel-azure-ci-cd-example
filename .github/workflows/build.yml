@@ -30,4 +30,4 @@ jobs:
 
       # Push the Docker image to ACR
       - name: Push Docker image to ACR
-        run: docker push ${{ secrets.ACR_NAME }}.azurecr.io/laravel-ci-cd-example:latest
+        run: docker push ${{ secrets.ACR_NAME }}.azurecr.io/laravel-azure-ci-cd-example:latest
