@@ -46,11 +46,14 @@ RUN chown -R www-data:www-data /var/www/html \
 # Install Node.js dependencies
 RUN npm install && npm run build
 
+# Set php-fpm config
+RUN sed -i 's/listen = 127.0.0.1:9000/listen = 0.0.0.0:9000/' /usr/local/etc/php-fpm.d/www.conf
+
 # Switch to www-data user
 USER www-data
 
 # Install Laravel dependencies
 RUN composer install --optimize-autoloader --no-dev
 
-# Start NGINX and PHP-FPM
+# Start PHP-FPM
 CMD ["php-fpm"]
