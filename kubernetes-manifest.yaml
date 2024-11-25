@@ -1,0 +1,91 @@
+# 1. Laravel Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: laravel-app
+  labels:
+    app: laravel-app
+spec:
+  replicas: 3 # Scale Laravel app to 3 replicas
+  selector:
+    matchLabels:
+      app: laravel-app
+  template:
+    metadata:
+      labels:
+        app: laravel-app
+    spec:
+      containers:
+        - name: laravel-app
+          image: felpslaravelstore.azurecr.io/laravel-azure-ci-cd-example:latest
+          ports:
+            - containerPort: 9000 # PHP-FPM port
+          env:
+            - name: APP_ENV
+              value: "production"
+            - name: APP_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: laravel-secrets
+                  key: APP_KEY
+            - name: DB_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: laravel-config
+                  key: DB_HOST
+            - name: DB_PORT
+              value: "3306"
+
+---
+# 2. Laravel Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: laravel-service
+spec:
+  selector:
+    app: laravel-app
+  ports:
+    - protocol: TCP
+      port: 80       # Exposed port for Ingress
+      targetPort: 9000 # Laravel's PHP-FPM port inside the pod
+
+---
+# 3. Ingress Resource
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: laravel-ingress
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+spec:
+  ingressClassName: nginx
+  rules:
+    - http: # Correctly structured as an array
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: laravel-service
+                port:
+                  number: 80
+
+---
+# 4. Laravel ConfigMap
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: laravel-config
+data:
+  DB_HOST: "mysql-service" # Replace with your database service name or endpoint
+
+---
+# 5. Laravel Secrets
+apiVersion: v1
+kind: Secret
+metadata:
+  name: laravel-secrets
+type: Opaque
+stringData:
+  APP_KEY: "base64:t/WCe1LaGsDdx2opRDufCJvuEAQ9avSchvLxhGG2tnA="
