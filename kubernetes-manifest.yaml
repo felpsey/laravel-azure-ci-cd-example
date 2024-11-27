@@ -54,6 +54,10 @@ metadata:
     nginx.ingress.kubernetes.io/rewrite-target: /
     nginx.ingress.kubernetes.io/add-base-url: "true"
     nginx.ingress.kubernetes.io/fastcgi-params-configmap: "fastcgi-config"
+    nginx.ingress.kubernetes.io/configuration-snippet: |
+      location / {
+          try_files $uri $uri/ /index.php?$query_string;
+      }
   name: ingress-laravel
 spec:
   ingressClassName: nginx
