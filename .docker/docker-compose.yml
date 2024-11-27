@@ -1,5 +1,5 @@
 services:
-  app:
+  laravel-app:
     build:
       context: ../
       dockerfile: .docker/app.Dockerfile
@@ -20,7 +20,7 @@ services:
     volumes:
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
     depends_on:
-      - app
+      - laravel-app
     networks:
       - laravel-network
 
