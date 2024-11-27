@@ -39,15 +39,17 @@ COPY --from=composer:2.6 /usr/bin/composer /usr/bin/composer
 # Copy Laravel project files
 COPY . /var/www/html/
 
-# Set permissions and ownership for Laravel files
-RUN chown -R www-data:www-data /var/www/html \
-    && chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
-
 # Install Node.js dependencies
 RUN npm install && npm run build
 
 # Install Laravel dependencies
 RUN composer install --optimize-autoloader --no-dev
+
+# Set permissions and ownership for Laravel files
+RUN chown -R www-data:www-data /var/www/html \
+    && chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
+
+USER www-data
 
 # Expose PHP-FPM port
 EXPOSE 9000
