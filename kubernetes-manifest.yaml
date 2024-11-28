@@ -39,7 +39,6 @@ spec:
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  annotations:
   name: ingress-laravel
 spec:
   ingressClassName: nginx
