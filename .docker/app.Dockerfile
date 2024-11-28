@@ -1,5 +1,5 @@
 # Use an official PHP image with required extensions for Laravel
-FROM php:8.3-fpm
+FROM php:8.3-apache
 
 # Set working directory
 WORKDIR /var/www/html
@@ -49,10 +49,13 @@ RUN composer install --optimize-autoloader --no-dev
 RUN chown -R www-data:www-data /var/www/html \
     && chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache /var/www/html/public
 
+RUN a2enmod rewrite headers
+
+COPY ./.docker/config/apache.conf /etc/apache2/sites-available/000-default.conf
+
 USER www-data
 
-# Expose PHP-FPM port
-EXPOSE 9000
+EXPOSE 80
 
-# Start PHP-FPM
-CMD ["sh", "-c", "php-fpm"]
+# Start Apache
+CMD ["apache2-foreground"]

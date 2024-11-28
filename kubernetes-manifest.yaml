@@ -19,8 +19,8 @@ spec:
         image: felpslaravelstore.azurecr.io/laravel-azure-ci-cd-example:latest
         imagePullPolicy: Always
         ports:
-        - containerPort: 9000
-        name: fastcgi
+        - containerPort: 80
+        name: laravel-app
       imagePullSecrets:
       - name: acr-laravel-creds
 ---
@@ -32,32 +32,14 @@ spec:
   selector:
     app: laravel-app
   ports:
-  - port: 9000 # Ingress
-    targetPort: 9000 # App
-    name: fastcgi
----
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: fastcgi-config
-data:
-  SCRIPT_FILENAME: /var/www/html/public/$fastcgi_script_name
-  DOCUMENT_ROOT: /var/www/html/public
-  SCRIPT_NAME: $fastcgi_script_name
+  - port: 80 # Ingress
+    targetPort: 80 # App
+    name: laravel-app
 ---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   annotations:
-    nginx.ingress.kubernetes.io/backend-protocol: "FCGI"
-    nginx.ingress.kubernetes.io/fastcgi-index: "index.php"
-    nginx.ingress.kubernetes.io/rewrite-target: /
-    nginx.ingress.kubernetes.io/add-base-url: "true"
-    nginx.ingress.kubernetes.io/fastcgi-params-configmap: "fastcgi-config"
-    nginx.ingress.kubernetes.io/configuration-snippet: |
-      location / {
-          try_files $uri $uri/ /index.php?$query_string;
-      }
   name: ingress-laravel
 spec:
   ingressClassName: nginx
@@ -70,4 +52,4 @@ spec:
           service:
             name: laravel-service
             port:
-              name: fastcgi
+              name: laravel-app
