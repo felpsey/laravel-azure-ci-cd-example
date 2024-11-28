@@ -44,6 +44,7 @@ data:
   SCRIPT_FILENAME: /var/www/html/public/$fastcgi_script_name
   DOCUMENT_ROOT: /var/www/html/public
   SCRIPT_NAME: $fastcgi_script_name
+  SERVER-SNIPPET: location / { try_files $uri $uri/ /index.php?$query_string; }
 ---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
@@ -54,10 +55,6 @@ metadata:
     nginx.ingress.kubernetes.io/rewrite-target: /
     nginx.ingress.kubernetes.io/add-base-url: "true"
     nginx.ingress.kubernetes.io/fastcgi-params-configmap: "fastcgi-config"
-    nginx.ingress.kubernetes.io/configuration-snippet: |
-      location / {
-          try_files $uri $uri/ /index.php?$query_string;
-      }
   name: ingress-laravel
 spec:
   ingressClassName: nginx
