@@ -55,7 +55,7 @@ COPY ./.docker/config/apache.conf /etc/apache2/sites-available/000-default.conf
 
 EXPOSE 80
 
-USER www-data
-
 # Start Apache
 CMD ["apache2-foreground"]
+
+USER www-data
