@@ -53,7 +53,7 @@ RUN a2enmod rewrite headers
 
 COPY ./.docker/config/apache.conf /etc/apache2/sites-available/000-default.conf
 
-EXPOSE 80
+EXPOSE 8080
 
 # Start Apache
 CMD ["apache2-foreground"]
