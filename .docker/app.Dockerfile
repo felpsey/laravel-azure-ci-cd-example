@@ -1,6 +1,8 @@
 # Use an official PHP image with required extensions for Laravel
 FROM php:8.3-apache
 
+USER root
+
 # Set working directory
 WORKDIR /var/www/html
 
