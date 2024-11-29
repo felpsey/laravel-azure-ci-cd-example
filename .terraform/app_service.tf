@@ -1,5 +1,10 @@
-provider "azurerm" {
-  features {}
+terraform {
+  required_providers {
+    azurerm = {
+      source  = "hashicorp/azurerm"
+      version = ">= 3.0.0"
+    }
+  }
 }
 
 variable "resource_group_name" {
@@ -56,13 +61,9 @@ resource "azurerm_mysql_flexible_server" "main" {
   resource_group_name = azurerm_resource_group.main.name
   location            = azurerm_resource_group.main.location
   sku_name            = "Standard_B1ms"
-  storage_mb          = 32768
-
-  administrator_login          = var.mysql_admin_username
-  administrator_login_password = var.mysql_admin_password
-
+  administrator_login = var.mysql_admin_username
+  administrator_password = var.mysql_admin_password
   version = "8.0"
-
   delegated_subnet_id = null
 }
 
@@ -71,6 +72,8 @@ resource "azurerm_mysql_flexible_database" "main" {
   name                = var.mysql_database_name
   resource_group_name = azurerm_resource_group.main.name
   server_name         = azurerm_mysql_flexible_server.main.name
+  charset   = "utf8mb4"
+  collation = "utf8mb4_general_ci"
 }
 
 # App Service Plan
