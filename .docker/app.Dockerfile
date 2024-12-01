@@ -38,7 +38,7 @@ USER www-data
 RUN composer install --no-dev --optimize-autoloader
 
 # Expose the default HTTP port
-EXPOSE 8080
+EXPOSE 80
 
 # Start the Apache server as www-data
 CMD ["apache2-foreground"]
