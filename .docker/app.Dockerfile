@@ -1,63 +1,44 @@
-# Use an official PHP image with required extensions for Laravel
+# Use the official PHP 8.3 Apache image as the base
 FROM php:8.3-apache
-
-USER root
 
 # Set working directory
 WORKDIR /var/www/html
 
-# Install system dependencies
+# Update package list and install required dependencies
 RUN apt-get update && apt-get install -y \
-    curl \
-    zip \
+    libzip-dev \
     unzip \
     git \
-    libpng-dev \
-    libonig-dev \
-    libxml2-dev \
-    libzip-dev \
-    nodejs \
-    npm \
-    nano\
-    && docker-php-ext-install \
-    pdo_mysql \
-    mbstring \
-    gd \
-    zip \
-    bcmath \
-    opcache \
-    && docker-php-ext-enable \
-    pdo_mysql \
-    mbstring \
-    gd \
-    zip \
-    bcmath \
-    opcache \
-    && apt-get clean && rm -rf /var/lib/apt/lists/*
+    curl \
+    && docker-php-ext-install zip pdo_mysql
 
-# Install Composer
+# Enable Apache mod_rewrite for Laravel's routing
+RUN a2enmod rewrite
+
+# Copy Composer from its official image
 COPY --from=composer:2.6 /usr/bin/composer /usr/bin/composer
 
-# Copy Laravel project files
-COPY . /var/www/html/
+ENV APACHE_DOCUMENT_ROOT=/var/www/html/public
 
-# Install Node.js dependencies
-RUN npm install && npm run build
+RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' \
+    /etc/apache2/sites-available/*.conf \
+    /etc/apache2/apache2.conf \
+    /etc/apache2/conf-available/*.conf
 
-# Install Laravel dependencies
-RUN composer install --optimize-autoloader --no-dev
+# Copy the Laravel project files to the container
+COPY . /var/www/html
 
-# Set permissions and ownership for Laravel files
-RUN chown -R www-data:www-data /var/www/html \
-    && chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache /var/www/html/public
+# Set proper permissions for the Laravel files
+RUN chown -R www-data:www-data /var/www/html
 
-RUN a2enmod rewrite headers
-
-COPY ./.docker/config/apache.conf /etc/apache2/sites-available/000-default.conf
-
-EXPOSE 8080
-
-# Start Apache
-CMD ["apache2-foreground"]
-
+# Switch to www-data user for running the web server
 USER www-data
+
+# Install Laravel dependencies using Composer
+RUN composer install --no-dev --optimize-autoloader
+
+# Expose the default HTTP port
+EXPOSE 80
+
+# Start the Apache server as www-data
+CMD ["apache2-foreground"]

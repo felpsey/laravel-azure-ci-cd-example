@@ -1,3 +1,4 @@
+# Deployment for Laravel App
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -19,11 +20,14 @@ spec:
         image: felpslaravelstore.azurecr.io/laravel-azure-ci-cd-example:latest
         imagePullPolicy: Always
         ports:
-        - containerPort: 8080
-        name: laravel-app
+        - containerPort: 80
+          name: http
       imagePullSecrets:
       - name: acr-laravel-creds
+
 ---
+
+# Service for Laravel App
 apiVersion: v1
 kind: Service
 metadata:
@@ -32,18 +36,23 @@ spec:
   selector:
     app: laravel-app
   ports:
-  - port: 80 # Ingress
-    targetPort: 8080 # App
-    name: laravel-app
+  - port: 80         # Exposed port for external traffic
+    targetPort: 80 # Internal app container port
+    protocol: TCP
+  type: ClusterIP
+
 ---
+
+# Ingress for Laravel App
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: ingress-laravel
+  name: laravel-ingress
 spec:
   ingressClassName: nginx
   rules:
-  - http:
+  - host: localhost
+    http:
       paths:
       - path: /
         pathType: Prefix
@@ -51,4 +60,4 @@ spec:
           service:
             name: laravel-service
             port:
-              name: laravel-app
+              number: 80
