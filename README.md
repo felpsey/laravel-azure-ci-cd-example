@@ -1,3 +1,5 @@
+![Build Status](https://github.com/felpsey/laravel-azure-ci-cd-example/actions/workflows/build.yml/badge.svg)
+
 This project aims to serve as an example for implementing Continuous Integration and Continuous Deployment (CI/CD) for a Laravel application using Azure.
 
 There are three methods of deploying this application:
