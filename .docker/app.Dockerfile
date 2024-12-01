@@ -10,6 +10,7 @@ RUN apt-get update && apt-get install -y \
     unzip \
     git \
     curl \
+    nano \
     && docker-php-ext-install zip pdo_mysql
 
 # Enable Apache mod_rewrite for Laravel's routing
